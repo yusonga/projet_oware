@@ -129,15 +129,17 @@ class OwareBoard {
         	System.out.print(holes[i]);
         	System.out.print("  ");
         }
-        System.out.println();
+       
     }
+    
     public int totalSeedsOnBoard() {
         int total = 0;
         for (Hole hole : holes) {
-            total += hole.getRedSeeds() + hole.getBlueSeeds() + hole.getTransparentSeeds();
+            total += hole.computeSum();
         }
         return total;
     }
+    
     public int makeMove(int holeNumber, char seedColor,char distributionBehavior) {
     	
 		Hole chosenHole = holes[holeNumber - 1];
@@ -160,10 +162,13 @@ class OwareBoard {
                 throw new IllegalArgumentException("Invalid seed color!");
         }
         int currentHole = holeNumber;
+       // System.out.println(currentHole);
+       
         while (seedsToDistribute > 0) {
         	
         	
         	currentHole = (currentHole % 16) + 1;
+        	//System.out.print(currentHole);
         	
         	
         	Hole hole = holes[currentHole - 1];
@@ -203,7 +208,6 @@ class OwareBoard {
 	
 	
 }
-
 
 
 class Game {
@@ -284,13 +288,15 @@ class Game {
 	}
 	
 	public void playComputerMove() { 
-		int depth = 5; // You can adjust the depth as needed
-	    Move bestMove = minimax(depth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
-	    board.makeMove(bestMove.hole, bestMove.seedColor, bestMove.distributionBehavior);
+		int depth = 3; //  adjust the depth as needed
+	    Move bestMove = minimax(depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+	    int finalHole =board.makeMove(bestMove.hole, bestMove.seedColor, bestMove.distributionBehavior);
+	    scoreOdd += capture(finalHole);
 	    System.out.println("Computer played " + bestMove);
 	    board.displayBoard();
 	    System.out.println("Computer Player Score: " + scoreOdd);
 	}
+	
 	private int evaluateBoard() {
 		int score = 0;
 
@@ -301,7 +307,6 @@ class Game {
 	    // Evaluate the potential for future captures
 	    for (Hole hole : board.holes) {
 	        int holeSum = hole.computeSum();
-
 	        // Assign points if a hole has the potential to be captured in the next move
 	        if (holeSum == 1 || holeSum == 2) {
 	            if (hole.getNumber() % 2 != 0) { // Odd hole, belongs to the computer
@@ -426,7 +431,6 @@ class Move {
         this.distributionBehavior = distributionBehavior;
     }
 
-    // Add other methods as needed
 
     @Override
     public String toString() {
@@ -434,7 +438,6 @@ class Move {
                 + ", score=" + score;
     }
 
-    // Add other constructors and methods as needed
 }
 
 public class Main {
